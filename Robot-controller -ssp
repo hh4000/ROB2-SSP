@@ -1,26 +1,24 @@
-from turtle import position
+from turtle import position, update
 from controller import Robot
 from controller import Motor
 from controller import PositionSensor
 
 TIME_STEP = 32
-
 robot = Robot()
 
-
-
-#This is left and right
+#This is x-axis, which moves horizontally.
 motorX = robot.getDevice("x-axis_motor")
 positionX = robot.getDevice("x-position_sensor")
 positionX.enable(TIME_STEP)
 
-#This is the tray
+#This is the y-axis, which is the tray that moves perpendicularly 
 motorY = robot.getDevice("y-axis_motor")
 positionY = robot.getDevice("y-position_sensor")
 positionY.enable(TIME_STEP)
 
 
-#This is up and down
+#This is the z-axis, which moves vertically.
+#The x-axis is depdent on the z-axis.
 motorZ = robot.getDevice("z-axis_motor")
 positionZ = robot.getDevice("z-position_sensor")
 positionZ.enable(TIME_STEP)
@@ -38,10 +36,15 @@ class Move:
         motorY.setPosition(y_coordinate)
   
 
+#This is a function for updating the position of the motor
+def Update():
+    position_values.x = positionX.getValue()
+    position_values.y = positionY.getValue()
+    position_values.z = positionZ.getValue()  
 
 
 
-# Variables for eaiser understanding of code
+# Variables for easier understanding of code
 up=0
 down=-0.1
 
@@ -78,15 +81,12 @@ motorX.setAcceleration(0.05)
 motorZ.setVelocity(0.05)
 motorY.setAcceleration(0.2)
 
+
+
 # "Main loop"
 while robot.step(TIME_STEP) != -1:
-    
-    position_values.x = positionX.getValue()
-    position_values.y = positionY.getValue()
-    position_values.z = positionZ.getValue() 
-    #-------------------------------------------------------------------------------
 
-
+    update()
     motorY.setPosition(coordinate_array.y[i])
 
     if position_values.z == down:
@@ -98,10 +98,14 @@ while robot.step(TIME_STEP) != -1:
             i=i+1
 
 
+
+    #This part here end the main loop when the index is equal to the length of the array
+    #As when the index is equal to the array length, it means that the array has no more coordinates for
+    # The robot to go.
     array_length = len (coordinate_array.x)
     if i == array_length:
         print("Finish")
         Move.X(0)
         Move.Y(0)
         Move.Z(0)
-        break 
+        break
