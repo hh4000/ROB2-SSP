@@ -1,0 +1,107 @@
+from turtle import position
+from controller import Robot
+from controller import Motor
+from controller import PositionSensor
+
+TIME_STEP = 32
+
+robot = Robot()
+
+
+
+#This is left and right
+motorX = robot.getDevice("x-axis_motor")
+positionX = robot.getDevice("x-position_sensor")
+positionX.enable(TIME_STEP)
+
+#This is the tray
+motorY = robot.getDevice("y-axis_motor")
+positionY = robot.getDevice("y-position_sensor")
+positionY.enable(TIME_STEP)
+
+
+#This is up and down
+motorZ = robot.getDevice("z-axis_motor")
+positionZ = robot.getDevice("z-position_sensor")
+positionZ.enable(TIME_STEP)
+
+
+# A class for moving the motors
+class Move:
+    def X(x_coordinate):
+        motorX.setPosition(x_coordinate)
+
+    def Z(z_coordinate):
+        motorZ.setPosition(z_coordinate)
+
+    def Y(y_coordinate):
+        motorY.setPosition(y_coordinate)
+  
+
+
+
+
+# Variables for eaiser understanding of code
+up=0
+down=-0.1
+
+
+#Index
+i=0
+
+
+# A class for storing position values
+class position_values:
+    x = 0
+    y = 0
+    z = 0
+
+# A class for storing the coordinates of the axis
+class coordinate_array:
+    x = [ -0.15, -0.075 , 0 , 0.075 ,0.15,
+           0.15, 0.075 , 0 , -0.075 ,-0.15,
+          -0.15, -0.075 , 0 , 0.075 ,0.15,
+           0.15, 0.075 , 0 , -0.075 ,-0.15,
+          -0.15, -0.075 , 0 , 0.075 ,0.15,
+           0.15, 0.075 , 0 , -0.075 ,-0.15,-0.15]
+
+    y = [   0  ,0  ,0  ,0  ,0  ,0 ,
+          -0.1,-0.1,-0.1,-0.1,-0.1,
+          -0.2,-0.2,-0.2,-0.2,-0.2,
+          -0.3,-0.3,-0.3,-0.3,-0.3,
+          -0.4,-0.4,-0.4,-0.4,-0.4,
+          -0.5,-0.5,-0.5,-0.5,-0.5,-0.5]
+
+# Here the velocity and acceleration is set, as to make sure the simulations doesn't run too fast
+motorZ.setVelocity(0.3)
+motorX.setAcceleration(0.05)
+motorZ.setVelocity(0.05)
+motorY.setAcceleration(0.2)
+
+# "Main loop"
+while robot.step(TIME_STEP) != -1:
+    
+    position_values.x = positionX.getValue()
+    position_values.y = positionY.getValue()
+    position_values.z = positionZ.getValue() 
+    #-------------------------------------------------------------------------------
+
+
+    motorY.setPosition(coordinate_array.y[i])
+
+    if position_values.z == down:
+        Move.Z(up)   
+    if position_values.z==up:
+        Move.X(coordinate_array.x[i])
+        if position_values.x  == coordinate_array.x[i] and position_values.z == up:
+            Move.Z(down)
+            i=i+1
+
+
+    array_length = len (coordinate_array.x)
+    if i == array_length:
+        print("Finish")
+        Move.X(0)
+        Move.Y(0)
+        Move.Z(0)
+        break 
